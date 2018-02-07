@@ -8,7 +8,8 @@ output:
 
 ## Loading and preprocessing the data
  Only obvious preprocessing at this stage is changing the date formate. 
-```{r}
+
+```r
 dat <- read.csv("activity.csv") 
 dat$date <- as.Date(dat$date, "%Y-%m-%d")
 ```
@@ -21,14 +22,20 @@ The following block of code performs the following tasks:
 - Calculate the mean and median of the total steps   
 
 
-```{r,echo = TRUE}
+
+```r
 total_steps_by_date <- aggregate(dat$steps, by = list(dat$date), FUN=sum, na.rm=TRUE)
 names(total_steps_by_date) <- c("Date", "Total steps")
 hist(total_steps_by_date$`Total steps`, xlab = "Steps", main = "Steps taken in a day", breaks = 10)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
 step_mean <- mean(total_steps_by_date$`Total steps`, na.rm = TRUE)
 step_median <- median(total_steps_by_date$`Total steps`, na.rm = TRUE)
 ```
-The average number of steps taken on any day are `r round(step_mean)`,  where the median number of step are `r step_median`.
+The average number of steps taken on any day are 9354,  where the median number of step are 10395.
 
 
 
@@ -36,38 +43,48 @@ The average number of steps taken on any day are `r round(step_mean)`,  where th
 
 Here we calculate the average number of steps for all intervel, averaged across the dates and plot the data. 
 
-```{r,echo = TRUE}
+
+```r
 average_steps_by_interval <- aggregate(dat$steps, by = list(dat$interval), FUN=sum, na.rm=TRUE)
 names(average_steps_by_interval) <- c("Intereval", "Average steps")
 plot(average_steps_by_interval$Intereval,average_steps_by_interval$`Average steps`, type = "l", xlab = "Interval", ylab = "Average steps")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
 The intervel that contains the most number of steps is the interval number 
-`r which(average_steps_by_interval$'Average steps' == max(average_steps_by_interval$'Average steps'))` and the associated number of steps are `r max(average_steps_by_interval$'Average steps')`.
+104 and the associated number of steps are 10927.
 
 ## Imputing missing values
 
 
-```{r, echo = TRUE}
-num_of_missing_val <- length(dat[is.na(dat$steps),1])
 
+```r
+num_of_missing_val <- length(dat[is.na(dat$steps),1])
 ```
 
-There are total `r num_of_missing_val` NA values in the data set. We can fill the NA's by using their interval number. We calculated the intervel averge across dates. We will replace NA with the average step assiciated with the respective interval id.   
+There are total 2304 NA values in the data set. We can fill the NA's by using their interval number. We calculated the intervel averge across dates. We will replace NA with the average step assiciated with the respective interval id.   
 We create a copy of the orignal data set named **dat_no_na**
 
-```{r, echo = TRUE}
+
+```r
 dat_no_na <- dat
 na_intervals <- dat[is.na(dat$steps),3]
 dat_no_na[is.na(dat_no_na)] <- average_steps_by_interval[match(na_intervals,average_steps_by_interval$Intereval), 'Average steps']
-
-#
-total_steps_no_na <- aggregate(dat_no_na$steps, by = list(dat_no_na$date), FUN=sum)
-names(total_steps_no_na) <- c("Date", "Steps")
-hist(total_steps_no_na$Steps, xlab = "Steps", main = "Steps taken in a day")
-step_mean_nona <- mean(total_steps_no_na$`Total steps`, na.rm = TRUE)
-step_median_nona <- median(total_steps_no_na$`Total steps`, na.rm = TRUE)
+hist(total_steps_by_date$`Total steps`, xlab = "Steps", main = "Steps taken in a day", breaks = 10)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+```r
+step_mean <- mean(total_steps_by_date$`Total steps`, na.rm = TRUE)
+step_median <- median(total_steps_by_date$`Total steps`, na.rm = TRUE)
+```
+```
+
+
+average_steps_by_interval[match(average_steps_by_interval$Intereval, aid[['activity']] ), 'name']
+## Are there differences in activity patterns between weekdays and weekends?
 
 
 
