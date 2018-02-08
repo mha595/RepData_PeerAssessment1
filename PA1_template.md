@@ -74,28 +74,72 @@ dat_no_na[is.na(dat_no_na)] <- average_steps_by_interval[match(na_intervals,aver
 
 #
 total_steps_no_na <- aggregate(dat_no_na$steps, by = list(dat_no_na$date), FUN=sum)
-names(total_steps_no_na) <- c("Date", "Steps")
-hist(total_steps_no_na$Steps, xlab = "Steps", main = "Steps taken in a day",breaks = 10)
+names(total_steps_no_na) <- c("Date", "Total steps")
+hist(total_steps_no_na$`Total steps`, xlab = "Steps", main = "Steps taken in a day",breaks = 10)
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ```r
-step_mean_nona <- mean(total_steps_no_na$`Total steps`, na.rm = TRUE)
+step_mean_nona <- mean(total_steps_no_na$`Total steps`)
+step_median_nona <- median(total_steps_no_na$`Total steps`)
 ```
 
-```
-## Warning in mean.default(total_steps_no_na$`Total steps`, na.rm = TRUE):
-## argument is not numeric or logical: returning NA
-```
+To compare the effect from removing of NA's, we will plot both histograms overlaed. 
+
 
 ```r
-step_median_nona <- median(total_steps_no_na$`Total steps`, na.rm = TRUE)
+df_1 <- total_steps_by_date
+df_2 <- total_steps_no_na
+df_1$isna <- "nA"
+df_2$isna <- "no_nA"
+df <- rbind(df_1,df_2)
+library(ggplot2)
+ggplot(df, aes(x=`Total steps`, color=isna)) +geom_histogram(fill="white", position="dodge")+theme(legend.position="top")
 ```
 
 ```
-## Warning in is.na(x): is.na() applied to non-(list or vector) of type 'NULL'
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
+Which show that the presence of NA were resulting in a high frequency around zero. When NAs were removed, a much higher frequency appeared around 11000 steps. 
+
+## Weekend vs weekday activity
+
+In the following we analyse any differencesin activity between weekday and weekends.  
+
+
+```r
+wd_df <- data.frame(Day = weekdays(as.Date(c(1:7), origin="1899-12-31")))
+cc <- factor(c("weekday", "weekday","weekday","weekday","weekday","weekend", "weekend"))
+wd_df$Isweekday <- cc
+
+dat_no_na$day <-  wd_df[match(weekdays(dat$date), wd_df$Day),2]
+
+split_dat_no_na <- split(dat_no_na, dat_no_na$day)
+mean_by_interval_weekday <- aggregate(split_dat_no_na$weekday$steps, by=list(split_dat_no_na$weekday$interval), FUN = mean)
+names(mean_by_interval_weekday) <- c("Intervels", "Mean_steps")
+mean_by_interval_weekday$day <- cc[1]
+mean_by_interval_weekend <- aggregate(split_dat_no_na$weekend$steps, by=list(split_dat_no_na$weekend$interval), FUN = mean)
+names(mean_by_interval_weekend) <- c("Intervels", "Mean_steps")
+mean_by_interval_weekend$day <- cc[7]
+mean_by_interval_comb <- rbind(mean_by_interval_weekday, mean_by_interval_weekend)
+ggplot(mean_by_interval_comb, aes(Intervels, Mean_steps)) + geom_line() + facet_grid(day ~ .)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
+
+From plots it appear that there is higher average number of steps in the 500 to 1000 window during weekdays. Weekends has more evenly distributed steps across the intervels. 
+
+To make an exact comparision we also plot them on the same plot.
+
+
+```r
+ggplot(mean_by_interval_comb, aes(Intervels, Mean_steps, color = day)) + geom_point() 
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 

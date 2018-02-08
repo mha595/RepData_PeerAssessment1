@@ -103,6 +103,7 @@ mean_by_interval_weekday$day <- cc[1]
 mean_by_interval_weekend <- aggregate(split_dat_no_na$weekend$steps, by=list(split_dat_no_na$weekend$interval), FUN = mean)
 names(mean_by_interval_weekend) <- c("Intervels", "Mean_steps")
 mean_by_interval_weekend$day <- cc[7]
+mean_by_interval_comb <- rbind(mean_by_interval_weekday, mean_by_interval_weekend)
 ggplot(mean_by_interval_comb, aes(Intervels, Mean_steps)) + geom_line() + facet_grid(day ~ .)
 
 ```
@@ -110,5 +111,10 @@ ggplot(mean_by_interval_comb, aes(Intervels, Mean_steps)) + geom_line() + facet_
 
 From plots it appear that there is higher average number of steps in the 500 to 1000 window during weekdays. Weekends has more evenly distributed steps across the intervels. 
 
+To make an exact comparision we also plot them on the same plot.
 
+```{r, echo = TRUE}
+ggplot(mean_by_interval_comb, aes(Intervels, Mean_steps, color = day)) + geom_point() 
+
+```
 
