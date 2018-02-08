@@ -45,7 +45,7 @@ Here we calculate the average number of steps for all intervel, averaged across 
 
 
 ```r
-average_steps_by_interval <- aggregate(dat$steps, by = list(dat$interval), FUN=sum, na.rm=TRUE)
+average_steps_by_interval <- aggregate(dat$steps, by = list(dat$interval), FUN=mean, na.rm=TRUE)
 names(average_steps_by_interval) <- c("Intereval", "Average steps")
 plot(average_steps_by_interval$Intereval,average_steps_by_interval$`Average steps`, type = "l", xlab = "Interval", ylab = "Average steps")
 ```
@@ -53,7 +53,7 @@ plot(average_steps_by_interval$Intereval,average_steps_by_interval$`Average step
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 The intervel that contains the most number of steps is the interval number 
-104 and the associated number of steps are 10927.
+104 and the associated number of steps are 206.1698113.
 
 ## Imputing missing values
 
@@ -71,20 +71,31 @@ We create a copy of the orignal data set named **dat_no_na**
 dat_no_na <- dat
 na_intervals <- dat[is.na(dat$steps),3]
 dat_no_na[is.na(dat_no_na)] <- average_steps_by_interval[match(na_intervals,average_steps_by_interval$Intereval), 'Average steps']
-hist(total_steps_by_date$`Total steps`, xlab = "Steps", main = "Steps taken in a day", breaks = 10)
+
+#
+total_steps_no_na <- aggregate(dat_no_na$steps, by = list(dat_no_na$date), FUN=sum)
+names(total_steps_no_na) <- c("Date", "Steps")
+hist(total_steps_no_na$Steps, xlab = "Steps", main = "Steps taken in a day",breaks = 10)
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ```r
-step_mean <- mean(total_steps_by_date$`Total steps`, na.rm = TRUE)
-step_median <- median(total_steps_by_date$`Total steps`, na.rm = TRUE)
-```
+step_mean_nona <- mean(total_steps_no_na$`Total steps`, na.rm = TRUE)
 ```
 
+```
+## Warning in mean.default(total_steps_no_na$`Total steps`, na.rm = TRUE):
+## argument is not numeric or logical: returning NA
+```
 
-average_steps_by_interval[match(average_steps_by_interval$Intereval, aid[['activity']] ), 'name']
-## Are there differences in activity patterns between weekdays and weekends?
+```r
+step_median_nona <- median(total_steps_no_na$`Total steps`, na.rm = TRUE)
+```
+
+```
+## Warning in is.na(x): is.na() applied to non-(list or vector) of type 'NULL'
+```
 
 
 
